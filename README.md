@@ -4,6 +4,8 @@ Mongoose-erd-generator
 A tool that extracts  information from mongoose schemas and turns them into a ERD diagram.
 Forked from: https://github.com/jodevsa/mongoose-erd-generator
 
+**TODO** update readme according to changes
+
 **Main difference is that it relies upon mongoose connected instance to get schema**
 
 
