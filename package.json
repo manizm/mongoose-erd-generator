@@ -2,13 +2,13 @@
   "name": "mongoose-erd-generator",
   "version": "0.0.5",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "dependencies": {
     "commander": "^2.15.1",
     "mongoose": "^5.1.2",
     "viz.js": "^2.0.0"
   },
-  "devDependencies": {},
   "bin": {
     "mongoose-erd-generator": "./bin/index.js"
   },

@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-var program = require('commander');
-const process = require('process');
-const fs = require('fs');
-const util = require('util');
-readdir = util.promisify(fs.readdir)
-const path = require('path');
-const ERD = require('../lib/ERD');
+// var program = require('commander');
+import program from 'commander';
+import process from 'process';
+import fs from 'fs';
+import util from 'util';
+const readdir = util.promisify(fs.readdir)
+import path from 'path';
+import * as ERD from '../lib/ERD.js';
 const allowedFormats=["svg", "dot", "xdot", "plain", "plain-ext", "ps", "ps2", "json", "json0"];
 const main = async () => {
   try {
@@ -21,18 +22,23 @@ const main = async () => {
         console.log(`Format :'${program.format}', is not supported.`);
         return;
     }
-    if (program.path && program.output) {
+    if (program.output) {
 
-      const modelDirectory = path.resolve(program.path);
+      // const modelDirectory = path.resolve(program.path);
       const outputFilePath = program.output;
-      const modelsPath = await readdir(modelDirectory);
-      const models = [];
-      for (const _model of modelsPath) {
-        if (_model.indexOf('.js') != -1 && !(_model === "index.js" && program.ignoreIndex)){
-          const model = require(path.join(modelDirectory, _model));
-          models.push(model);
-        }
-      }
+      // const modelsPath = await readdir(modelDirectory);
+      // const models = mds.models.map(m => m.default); // used for non mjs
+
+      // allows giving mongoose connected instance
+      const mongooseInstance = await import('../../../cuckoo/expresscuckoo/server/models/db.mjs')
+        .then(res => res.default);
+      const models = Object.values(mongooseInstance.models);
+      // for (const _model of modelsPath) {
+      //   if (_model.indexOf('.js') != -1 && !(_model === "index.js" && program.ignoreIndex)){
+      //     const model = require(path.join(modelDirectory, _model));
+      //     models.push(model);
+      //   }
+      // }
       const svg = await ERD.generateFromModels(models, {
         format:program.format,
         collection: {
@@ -42,6 +48,7 @@ const main = async () => {
       });
 
       fs.writeFileSync(outputFilePath, svg);
+      mongooseInstance.connection.on('open', async () => await mongooseInstance.disconnect())
       console.log('ERD written to',outputFilePath);
     }
   } catch (e) {
